@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Input, Button } from '../components/ui/index.jsx'
+import { CheckCircle, Mail } from 'lucide-react'
 
 // ── Login ─────────────────────────────────────────────────────
 export function LoginPage() {
@@ -51,17 +52,50 @@ export function RegisterPage() {
   const [form, setForm] = useState({ fullName: '', email: '', password: '', companyName: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError(''); setLoading(true)
 
-    const { error } = inviteToken
+    const { data, error } = inviteToken
       ? await signUpWithInvite({ ...form, inviteToken })
       : await signUp(form)
 
-    if (error) { setError(error.message); setLoading(false) }
-    else navigate('/dashboard')
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+    } else if (data?.session) {
+      // Confirmação de email desativada no Supabase → sessão imediata
+      navigate('/dashboard')
+    } else {
+      // Email de confirmação enviado
+      setSuccess(true)
+      setLoading(false)
+    }
+  }
+
+  if (success) {
+    return (
+      <AuthShell title="" subtitle="Gestão de obras e finanças">
+        <div className="text-center py-4">
+          <div className="w-14 h-14 bg-[#EAF5EC] rounded-full flex items-center justify-center mx-auto mb-4">
+            <Mail size={26} className="text-[#4A9B5C]" />
+          </div>
+          <h2 className="text-base font-semibold text-gray-900 mb-2">Verifique seu email</h2>
+          <p className="text-sm text-gray-500 mb-1">
+            Enviamos um link de confirmação para
+          </p>
+          <p className="text-sm font-medium text-[#2C5530] mb-5">{form.email}</p>
+          <p className="text-xs text-gray-400 mb-6">
+            Clique no link do email para ativar sua conta e acessar o Inco.
+          </p>
+          <Link to="/login" className="text-sm text-[#2C5530] font-medium hover:underline">
+            Voltar para o login
+          </Link>
+        </div>
+      </AuthShell>
+    )
   }
 
   return (

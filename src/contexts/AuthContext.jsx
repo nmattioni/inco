@@ -42,14 +42,20 @@ export function AuthProvider({ children }) {
   async function signUp({ email, password, fullName, companyName }) {
     return supabase.auth.signUp({
       email, password,
-      options: { data: { full_name: fullName, company_name: companyName } }
+      options: {
+        data: { full_name: fullName, company_name: companyName },
+        emailRedirectTo: `${window.location.origin}/dashboard`,
+      },
     })
   }
 
   async function signUpWithInvite({ email, password, fullName, inviteToken }) {
     return supabase.auth.signUp({
       email, password,
-      options: { data: { full_name: fullName, invite_token: inviteToken } }
+      options: {
+        data: { full_name: fullName, invite_token: inviteToken },
+        emailRedirectTo: `${window.location.origin}/dashboard`,
+      },
     })
   }
 

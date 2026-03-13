@@ -3,11 +3,14 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in .env')
+if (!supabaseUrl || supabaseUrl === 'placeholder' || !supabaseAnonKey || supabaseAnonKey === 'placeholder') {
+  console.warn('[Inco] Variáveis VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY não configuradas. Verifique a integração Supabase no Vercel.')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(
+  supabaseUrl && supabaseUrl !== 'placeholder' ? supabaseUrl : 'https://placeholder.supabase.co',
+  supabaseAnonKey && supabaseAnonKey !== 'placeholder' ? supabaseAnonKey : 'placeholder-anon-key',
+)
 
 // ── Types ─────────────────────────────────────────────────────
 
